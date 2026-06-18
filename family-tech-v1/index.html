@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>العائلة التقنية</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="splash" id="splash">
+    <div class="splash-card">
+      <img src="assets/logo/logo.png" alt="شعار العائلة التقنية" />
+      <h1>العائلة التقنية</h1>
+      <p>جاري تحميل عالم التحديات...</p>
+      <div class="loader"><span></span></div>
+    </div>
+  </div>
+
+  <main class="app">
+    <section class="screen user-screen" id="userSelection">
+      <div class="screen-title center">
+        <img class="mini-logo" src="assets/logo/logo.png" alt="logo" />
+        <span class="season">الموسم الأول</span>
+        <h1>اختر شخصيتك</h1>
+        <p>كل عضو له مهامه ونقاطه وإنجازاته الخاصة.</p>
+      </div>
+      <div id="usersContainer" class="users-grid"></div>
+    </section>
+
+    <section class="screen home-screen" id="home">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <img class="logo" src="assets/logo/logo.png" alt="شعار العائلة التقنية" />
+      <span class="season">الموسم الأول</span>
+      <h1>العائلة التقنية</h1>
+      <p>تعلم • تنافس • استمتع</p>
+      <button class="main-btn pulse" onclick="openDashboard()">🚀 ابدأ المغامرة</button>
+    </section>
+
+    <section class="screen dashboard-screen" id="dashboard">
+      <header class="topbar">
+        <div>
+          <span id="welcomeText">مرحبًا 👋</span>
+          <h2>جاهز لأول مهمة؟</h2>
+        </div>
+        <div class="top-actions">
+          <button class="admin-pill admin-only" onclick="openAdmin()">🛠 الإدارة</button>
+          <button class="logout-btn" onclick="logout()" title="تبديل المستخدم">🚪</button>
+        </div>
+      </header>
+
+      <div class="profile-card glass" id="profileCard">
+        <div class="profile-avatar" id="profileAvatar">👤</div>
+        <div class="profile-info">
+          <span id="profileNickname">عضو في العائلة التقنية</span>
+          <h3 id="profileName">المستخدم</h3>
+          <div class="progress-line"><span id="xpBar"></span></div>
+          <small id="profileStats">0 نقطة • 🌱 مبتدئ</small>
+        </div>
+      </div>
+
+      <div class="mission-card glass">
+        <div class="mission-head">
+          <span>🎯 مهمتك التالية</span>
+          <b id="nextTaskXP">+0 نقطة</b>
+        </div>
+        <h3 id="nextTaskTitle">لا توجد مهام حالية</h3>
+        <p id="nextTaskDescription">ستظهر هنا آخر مهمة متاحة لك.</p>
+        <button class="main-btn" onclick="openTasksPage()">استعراض المهام</button>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="stat-widget glass" onclick="openLeaderboard()">
+          <strong id="rankNumber">-</strong>
+          <span>ترتيبك</span>
+        </div>
+        <div class="stat-widget glass" onclick="openAchievements()">
+          <strong id="badgeCount">0</strong>
+          <span>أوسمتك</span>
+        </div>
+      </div>
+
+      <div class="latest-card glass">
+        <h3>✨ آخر إنجاز</h3>
+        <p id="latestAchievement">لا يوجد إنجاز بعد.</p>
+      </div>
+    </section>
+
+    <section class="screen tasks-screen" id="tasksPage">
+      <header class="topbar">
+        <div>
+          <span>🎯 المهام</span>
+          <h2>مهامك المتاحة</h2>
+        </div>
+        <button class="close-admin" onclick="openDashboard()">رجوع</button>
+      </header>
+      <div id="userTasksList"></div>
+    </section>
+
+    <section class="screen achievements-screen" id="achievementsPage">
+      <header class="topbar">
+        <div>
+          <span>🎖 الإنجازات</span>
+          <h2>أوسمتك ومستواك</h2>
+        </div>
+        <button class="close-admin" onclick="openDashboard()">رجوع</button>
+      </header>
+      <div id="achievementsList" class="achievements-list"></div>
+    </section>
+
+    <section class="screen leaderboard-screen" id="leaderboardPage">
+      <header class="topbar">
+        <div>
+          <span>🏆 لوحة الشرف</span>
+          <h2>ترتيب العائلة</h2>
+        </div>
+        <button class="close-admin" onclick="openDashboard()">رجوع</button>
+      </header>
+      <div id="leaderboardList"></div>
+    </section>
+
+    <section class="screen admin-screen" id="admin">
+      <header class="topbar">
+        <div>
+          <span>وضع الإدارة 🛠</span>
+          <h2>لوحة المدير</h2>
+        </div>
+        <button class="close-admin" onclick="openDashboard()">إغلاق</button>
+      </header>
+
+      <div class="admin-tabs glass">
+        <button class="active" onclick="showAdminTab('tasksAdmin', this)">المهام</button>
+        <button onclick="showAdminTab('reviewsAdmin', this)">المراجعة</button>
+        <button onclick="showAdminTab('activityAdmin', this)">السجل</button>
+      </div>
+
+      <div class="admin-tab active" id="tasksAdmin">
+        <div class="admin-card glass">
+          <h3 id="taskFormTitle">➕ إضافة مهمة</h3>
+          <p>المهام العامة تظهر للجميع، والخاصة تظهر للشخص المحدد فقط.</p>
+          <form class="task-form show" id="taskForm">
+            <input id="editingTaskId" type="hidden" />
+
+            <label>عنوان المهمة</label>
+            <input id="taskTitle" type="text" placeholder="مثال: تحدي استخدام ChatGPT" />
+
+            <label>وصف المهمة</label>
+            <textarea id="taskDescription" placeholder="اكتب تفاصيل المهمة هنا..."></textarea>
+
+            <label>نوع المهمة</label>
+            <div class="task-type">
+              <label><input type="radio" name="taskType" value="general" checked onchange="toggleTargetUser()" /> عامة</label>
+              <label><input type="radio" name="taskType" value="private" onchange="toggleTargetUser()" /> خاصة</label>
+            </div>
+
+            <div class="target-user" id="targetUser">
+              <label>اختر الشخص</label>
+              <select id="taskTarget"></select>
+            </div>
+
+            <label>النقاط</label>
+            <input id="taskXP" type="number" value="25" min="1" />
+
+            <label>تاريخ البداية</label>
+            <input id="taskStart" type="date" />
+
+            <label>تاريخ النهاية</label>
+            <input id="taskEnd" type="date" />
+
+            <button type="button" class="main-btn" onclick="saveTask()">🚀 حفظ المهمة</button>
+            <button type="button" class="secondary-btn" onclick="resetTaskForm()">إلغاء التعديل</button>
+          </form>
+        </div>
+
+        <div class="admin-card glass">
+          <h3>📋 إدارة المهام</h3>
+          <div id="adminTasksList"></div>
+        </div>
+      </div>
+
+      <div class="admin-tab" id="reviewsAdmin">
+        <div class="admin-card glass">
+          <h3>⏳ مهام بانتظار المراجعة</h3>
+          <div id="pendingReviewsList"></div>
+        </div>
+      </div>
+
+      <div class="admin-tab" id="activityAdmin">
+        <div class="admin-card glass">
+          <h3>📜 سجل العمليات</h3>
+          <p>هنا تظهر عمليات الاعتماد والرفض والتراجع، ويمكنك سحب النقاط عند الاعتماد بالخطأ.</p>
+          <div id="activityLogList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="active" onclick="openDashboard()">🏠<span>الرئيسية</span></button>
+    <button onclick="openTasksPage()">🎯<span>المهام</span></button>
+    <button onclick="openLeaderboard()">🏆<span>الشرف</span></button>
+    <button onclick="openAchievements()">🎖<span>الإنجازات</span></button>
+  </nav>
+
+  <div class="modal" id="taskModal">
+    <div class="modal-card glass">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <span id="modalType">مهمة</span>
+      <h2 id="modalTaskTitle">عنوان المهمة</h2>
+      <p id="modalTaskDescription">وصف المهمة</p>
+      <b id="modalTaskXP">+0 نقطة</b>
+      <textarea id="submissionAnswer" placeholder="اكتب إنجازك أو إجابتك هنا..."></textarea>
+      <button class="main-btn" onclick="submitCurrentTask()">إرسال للمراجعة</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+  <script src="data/users.js"></script>
+  <script src="data/app.js"></script>
+  <script src="data/firebase.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
