@@ -54,6 +54,7 @@ async function startFirebaseSync() {
       App.submissions = Array.isArray(data.submissions) ? data.submissions : [];
       App.progress = data.progress || {};
       App.activity = Array.isArray(data.activity) ? data.activity : [];
+      App.notifications = Array.isArray(data.notifications) ? data.notifications : [];
       App.online = true;
       dataLoaded = true;
 
@@ -75,6 +76,7 @@ async function startFirebaseSync() {
 
 function getDefaultState() {
   const progress = {};
+
   users.forEach(user => {
     progress[user.id] = { xp: 0, completedTasks: [], badges: [], latestAchievement: "" };
   });
@@ -84,6 +86,7 @@ function getDefaultState() {
     submissions: [],
     progress,
     activity: [],
+    notifications: [],
     updatedAt: new Date().toISOString()
   };
 }
@@ -96,6 +99,7 @@ async function saveData() {
       submissions: App.submissions,
       progress: App.progress,
       activity: App.activity || [],
+      notifications: App.notifications || [],
       updatedAt: new Date().toISOString()
     }, { merge: true });
   } catch (error) {
@@ -176,6 +180,7 @@ function refreshAll() {
   renderActivityLog();
   renderLeaderboard();
   renderAchievements();
+  renderNotifications();
 }
 
 function renderDashboard() {
@@ -264,12 +269,13 @@ function saveTask() {
   };
 
   if (editingId) {
-    App.tasks = App.tasks.map(item => item.id === editingId ? task : item);
-    toast("تم تعديل المهمة.");
-  } else {
-    App.tasks.push(task);
-    toast("تمت إضافة المهمة.");
-  }
+  App.tasks = App.tasks.map(item => item.id === editingId ? task : item);
+  toast("تم تعديل المهمة.");
+} else {
+  App.tasks.push(task);
+  createTaskNotifications(task);
+  toast("تمت إضافة المهمة وإرسال التنبيه.");
+}
 
   saveData();
   resetTaskForm();
@@ -467,6 +473,12 @@ function reviewSubmission(submissionId, status) {
         undone: false
       });
     }
+    createNotification(
+  sub.userId,
+  "⭐ تمت إضافة نقاط",
+  `تم اعتماد مهمة "${task?.title || "مهمة"}" وإضافة ${task?.xp || 0} نقطة إلى رصيدك.`,
+  "points"
+);
     toast("تم قبول المهمة وإضافة النقاط.");
   } else {
     logActivity({
@@ -478,6 +490,12 @@ function reviewSubmission(submissionId, status) {
       message: `تم رفض مهمة ${task?.title || "مهمة"} لـ ${getUserName(sub.userId)}`,
       undone: false
     });
+    createNotification(
+  sub.userId,
+  "❌ تم رفض المهمة",
+  `تم رفض مهمة "${task?.title || "مهمة"}".`,
+  "reject"
+);
     toast("تم رفض المهمة.");
   }
   saveData();
@@ -656,4 +674,82 @@ function checkFamilyCode(){
 
     }
 
+}
+function createNotification(userId, title, message, type = "info") {
+  if (!App.notifications) App.notifications = [];
+
+  App.notifications.unshift({
+    id: String(Date.now()) + Math.random().toString(16).slice(2),
+    userId,
+    title,
+    message,
+    type,
+    read: false,
+    createdAt: new Date().toISOString()
+  });
+}
+
+function createTaskNotifications(task) {
+  if (task.type === "general") {
+    users.forEach(user => {
+      createNotification(
+        user.id,
+        "🎯 مهمة جديدة",
+        `تمت إضافة مهمة جديدة: ${task.title}`,
+        "task"
+      );
+    });
+  } else {
+    createNotification(
+      task.target,
+      "🎯 مهمة خاصة لك",
+      `لديك مهمة خاصة جديدة: ${task.title}`,
+      "task"
+    );
+  }
+}
+
+function getCurrentUserNotifications() {
+  if (!App.currentUser) return [];
+  return (App.notifications || []).filter(n => n.userId === App.currentUser.id);
+}
+
+function renderNotifications() {
+  const count = document.getElementById("notificationCount");
+  const list = document.getElementById("notificationsList");
+
+  if (!App.currentUser || !count || !list) return;
+
+  const notifications = getCurrentUserNotifications();
+  const unread = notifications.filter(n => !n.read);
+
+  count.innerText = unread.length;
+  count.style.display = unread.length ? "grid" : "none";
+
+  if (!notifications.length) {
+    list.innerHTML = `<div class="empty">لا توجد تنبيهات حاليًا.</div>`;
+    return;
+  }
+
+  list.innerHTML = notifications.map(n => `
+    <div class="notification-item ${n.read ? "" : "unread"}" onclick="markNotificationRead('${n.id}')">
+      <h4>${n.title}</h4>
+      <p>${n.message}</p>
+      <small>${new Date(n.createdAt).toLocaleString("ar-SA")}</small>
+    </div>
+  `).join("");
+}
+
+function toggleNotifications() {
+  document.getElementById("notificationsPanel").classList.toggle("show");
+  renderNotifications();
+}
+
+function markNotificationRead(id) {
+  const notification = (App.notifications || []).find(n => n.id === id);
+  if (!notification) return;
+
+  notification.read = true;
+  saveData();
+  renderNotifications();
 }

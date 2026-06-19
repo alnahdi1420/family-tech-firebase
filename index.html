@@ -66,6 +66,10 @@
           <h2>جاهز لأول مهمة؟</h2>
         </div>
         <div class="top-actions">
+          <button class="notify-btn" onclick="toggleNotifications()">
+  🔔
+  <span id="notificationCount">0</span>
+</button>
           <button class="admin-pill admin-only" onclick="openAdmin()">🛠 الإدارة</button>
           <button class="logout-btn" onclick="logout()" title="تبديل المستخدم">🚪</button>
         </div>
@@ -235,7 +239,15 @@
       <button class="main-btn" onclick="submitCurrentTask()">إرسال للمراجعة</button>
     </div>
   </div>
-
+<div class="notifications-panel" id="notificationsPanel">
+  <div class="notifications-card glass">
+    <div class="notifications-head">
+      <h3>🔔 التنبيهات</h3>
+      <button onclick="toggleNotifications()">×</button>
+    </div>
+    <div id="notificationsList"></div>
+  </div>
+</div>
   <div class="toast" id="toast"></div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
