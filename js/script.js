@@ -1,3 +1,4 @@
+const FAMILY_CODE = "NHD2026";
 const STORAGE = {
   currentUser: "currentUser"
 };
@@ -18,7 +19,14 @@ let writingToFirebase = false;
 
 window.addEventListener("load", () => {
   setTimeout(() => document.getElementById("splash")?.classList.add("hide"), 1000);
+  if(localStorage.getItem("familyAccess")){
 
+    document
+        .getElementById("familyLock")
+        .classList
+        .add("hide");
+
+}
   populateUsers();
   populateAdminTargets();
 
@@ -621,4 +629,31 @@ function toast(message) {
   el.classList.add("show");
   clearTimeout(window.toastTimer);
   window.toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
+}
+function checkFamilyCode(){
+
+    const code = document
+        .getElementById("familyCode")
+        .value;
+
+    if(code===FAMILY_CODE){
+
+        localStorage.setItem(
+            "familyAccess",
+            "true"
+        );
+
+        document
+            .getElementById("familyLock")
+            .classList
+            .add("hide");
+
+    }
+
+    else{
+
+        alert("رمز العائلة غير صحيح");
+
+    }
+
 }
