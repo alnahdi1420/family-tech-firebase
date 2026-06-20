@@ -1,4 +1,4 @@
-App.notconst FAMILY_CODE = "NHD2026";
+const FAMILY_CODE = "NHD2026";
 const STORAGE = {
   currentUser: "currentUser"
 };
